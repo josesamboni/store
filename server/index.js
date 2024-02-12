@@ -18,7 +18,7 @@ const corsOptions = {
 };
 router.use(cors(corsOptions));
 
-router.use("/api", require("./api/index.js"));
+//router.use("/api", require("./api/index.js"));
 // router.use("/auth", require("/api/auth"))
 
 router.listen(PORT, () => {
