@@ -1,20 +1,22 @@
 // MAIN JS
-
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const app = express();
 const { PORT = 3000 } = process.env;
-const bodyParser = require("body-parser");
 
 
-app.use(bodyParser.json());
+
 app.use(express.json());
+
 const corsOptions = {
   origin: "*",
   credentials: true,
-  optionSuccessStatus: 200,
+  optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
+
+
 
 // calling to API index.js
 app.use("/api", require("./api"));
@@ -24,5 +26,4 @@ app.use("/auth", require("./auth"))
 app.listen(PORT, () => {
   console.log(`server is on ${PORT}`);
 });
-
 
