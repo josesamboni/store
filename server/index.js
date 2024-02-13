@@ -1,28 +1,28 @@
+// MAIN JS
+
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { PORT = 3000 } = process.env;
-const router = express();
 const bodyParser = require("body-parser");
 
 
-router.use(bodyParser.json());
-//router.use(bodyParser.urlencoded({extended:false}))
-
-router.use(express.json());
-
+app.use(bodyParser.json());
+app.use(express.json());
 const corsOptions = {
   origin: "*",
   credentials: true,
   optionSuccessStatus: 200,
 };
-router.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
-//router.use("/api", require("./api/index.js"));
-// router.use("/auth", require("/api/auth"))
+// calling to API index.js
+app.use("/api", require("./api"));
+app.use("/auth", require("./auth"))
 
-router.listen(PORT, () => {
+// PORT 
+app.listen(PORT, () => {
   console.log(`server is on ${PORT}`);
 });
 
-module.exports = router;
+
