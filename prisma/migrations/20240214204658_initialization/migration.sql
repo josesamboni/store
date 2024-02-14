@@ -15,7 +15,7 @@ CREATE TABLE "product" (
     "id" SERIAL NOT NULL,
     "productName" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "price" DECIMAL(65,30) NOT NULL,
+    "price" DECIMAL(4,2) NOT NULL,
 
     CONSTRAINT "product_pkey" PRIMARY KEY ("id")
 );
@@ -44,12 +44,6 @@ CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "order_userId_key" ON "order"("userId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "lineItems_orderId_key" ON "lineItems"("orderId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "lineItems_productId_key" ON "lineItems"("productId");
 
 -- AddForeignKey
 ALTER TABLE "order" ADD CONSTRAINT "order_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
