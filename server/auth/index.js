@@ -21,7 +21,7 @@ router.post("/register", async (req, res, next) => {
       },
     });
     const token = jwt.sign({ id: user.id }, process.env.JWT);
-    res.status(201).send({ token });
+    res.status(201).send({ token, email: user.email });
   } catch (error) {
     next(error);
   }
@@ -60,14 +60,15 @@ router.get("/me", async (req, res, next) => {
       return res.status(404).send("user not found.");
     }
 
-    //delete bc you dont want to send back the password to the user
-    delete user.password;
-    // get costumers order info baaes
+//delete bc you dont want to send back the password to the user
+
+    // delete user.password;
+    // //get costumers orders
     const order = await prisma.order.findFirst({
-      where: { userid: req.user.id },
+    where: { userid: req.user.id },
     });
 
-    res.send(order, user);
+    res.send(user);
   } catch (error) {
     next(error);
   }
