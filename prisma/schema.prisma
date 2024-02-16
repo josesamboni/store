@@ -14,7 +14,7 @@ model user {
   email     String  @unique
   password  String
   isAdmin   Boolean
-  orders    order?
+  orders    order[]
 }
 
 model product {
@@ -27,7 +27,7 @@ model product {
 
 model order {
   id        Int         @id @default(autoincrement())
-  userId    Int         @unique
+  userId    Int         
   isCart    Boolean
   lineItems lineItems[]
   user      user        @relation(fields: [userId], references: [id])
