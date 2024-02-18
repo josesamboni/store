@@ -7,7 +7,7 @@ const user = [
     lastName: "Smith",
     email: "milo@gmail.com",
     password: "milo4445",
-    isAdmin: true,
+    isadmin: true,
   },
 
   {
@@ -15,7 +15,7 @@ const user = [
     lastName: "Freeman",
     email: "tyrice@gmail.com",
     password: "tyrice444",
-    isAdmin: true,
+    isadmin: true,
   },
 
   {
@@ -23,29 +23,29 @@ const user = [
     lastName: "Zheng",
     email: "fiona@gmail.com",
     password: "Fiona5888",
-    isAdmin: true,
+    isadmin: true,
   },
 ];
 
-const products = [
+const product = [
   {
-    productName: "Skittles",
+    productName: "Bubble Gum",
     description:
-      "Skittles consist of hard sugar shells imprinted with the letter 'S', similar to M&M's which have the letter 'M'. The interior consists mainly of sugar, corn syrup, and hydrogenated palm kernel oil along with fruit juice, citric acid, and natural and artificial flavors.",
-    price: 2.99,
+      "Bubble gum candy is a soft and chewy sweet treat, offering a delightful and nostalgic experience for candy enthusiasts of all ages.",
+    price: 1.99,
   },
 
   {
-    productName: "KitKat",
+    productName: "Dark and Milk Chocolates",
     description:
-      "Kit Kat (stylised as KitKat in various countries) is a chocolate-covered wafer bar confection created by Rowntree's of York, United Kingdom.",
-    price: 3.99,
+      "Chocolate is a beloved treat enjoyed by people all over the world. They are decadent confections made from cocoa beans, which are the seeds of the cacao tree",
+    price: 9.99,
   },
 
   {
-    productName: "Snickers",
+    productName: "Taffy Candy",
     description:
-      "Snickers is a brand of chocolate bar consisting of nougat topped with caramel and peanuts, all encased in milk chocolate.",
+      "Taffy is a soft and chewy candy that is typically made from sugar, corn syrup, butter, and flavorings.",
     price: 1.99,
   },
 
@@ -53,51 +53,59 @@ const products = [
     productName: "Hard Candy",
     description:
       "A hard candy is a sugar candy prepared from one or more sugar-based syrups that is heated to a temperature of 160 °C (320 °F) to make candy.",
-    price: 8.99,
+    price: 7.99,
   },
 ];
 
 const order = [
   {
     userId: 1,
-    isCart: true,
+    total: 8.99,
   },
 ];
 
-const lineItems = [
+const cart = [
   {
-    orderId: 1,
+    userId: 1,
     productId: 2,
+    quantity: 3,
+  },
+];
+
+const orderDetail = [
+  {
+    productId: 2,
+    orderId: 1,
     quantity: 3,
   },
 ];
 
 // function
 const generateData = async () => {
-  await prisma.lineItems.deleteMany();
+  await prisma.orderDetail.deleteMany();
+  await prisma.cart.deleteMany();
   await prisma.order.deleteMany();
   await prisma.product.deleteMany();
   await prisma.user.deleteMany();
-
+ 
   await prisma.$executeRaw`ALTER SEQUENCE "user_id_seq" RESTART WITH 1`;
   await prisma.$executeRaw`ALTER SEQUENCE "product_id_seq" RESTART WITH 1`;
   await prisma.$executeRaw`ALTER SEQUENCE "order_id_seq" RESTART WITH 1`;
+  await prisma.$executeRaw`ALTER SEQUENCE "orderDetail_id_seq" RESTART WITH 1`;
+  await prisma.$executeRaw`ALTER SEQUENCE "cart_id_seq" RESTART WITH 1`;
   // await prisma.$executeRaw`ALTER SEQUENCE "lineitems_id_seq" RESTART WITH 1`;
 
-  await prisma.user.createMany({
-    data: user,
-  });
+  //Create users & products
+  await prisma.user.createMany({ data: user });
+  await prisma.product.createMany({ data: product });
 
-  await prisma.product.createMany({
-    data: products,
-  });
-
-  await prisma.order.createMany({
-    data: order,
-  });
-
-  await prisma.lineItems.createMany({
-    data: lineItems,
+  //create orders
+  await prisma.order.createMany({ data: order });
+  //create orderDetails
+  await prisma.orderDetail.createMany({ data: orderDetail });
+  //create carts
+  await prisma.cart.createMany({
+    data: cart,
   });
 };
 

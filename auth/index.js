@@ -6,7 +6,8 @@ const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-//register new account
+// POST || Register new User Account || TEST APPROVED!
+
 router.post("/register", async (req, res, next) => {
   try {
     const salt = 8;
@@ -17,17 +18,17 @@ router.post("/register", async (req, res, next) => {
         lastName: req.body.lastName,
         email: req.body.email,
         password: hashedPassword,
-        isAdmin: true,
+        isadmin: true,
       },
     });
-    const token = jwt.sign({ id: user.id }, process.env.JWT);
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
     res.status(201).send({ token, email: user.email });
   } catch (error) {
     next(error);
   }
 });
 
-//log in
+//POST || Login to an existing account || TEST APPROVED!
 router.post("/login", async (req, res, next) => {
   try {
     const user = await prisma.user.findFirst({
@@ -35,20 +36,22 @@ router.post("/login", async (req, res, next) => {
         email: req.body.email,
       },
     });
+
     //bcrypt password
     const match = await bcrypt.compare(req.body.password, user?.password);
     if (!match) {
       return res.status(401).send("try credentials again");
     }
     //create token with userID
-    const token = jwt.sign({ id: user.id }, process.env.JWT);
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
     res.send({ token });
   } catch (error) {
     next(error);
   }
 });
 
-// get costumer by ID
+
+// GET || Get the currently logged in user || ** RETEST 
 router.get("/me", async (req, res, next) => {
   try {
     const user = await prisma.user.findFirst({

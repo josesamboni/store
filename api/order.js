@@ -3,13 +3,13 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const router = express.Router();
 
-//POST ||   Create a new Order / add cart
+//POST ||   Create an Order for an existing User || TEST APPROVED!
 router.post("/", async (req, res, next) => {
   try {
     const order = await prisma.order.create({
       data: {
         userId: req.body.userId,
-        isCart: true,
+        total: req.body.total,
       },
     });
     res.status(201).send(order);
@@ -18,7 +18,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-// PUT ||  Update an Order by orderID
+// PUT ||  Update an Order by orderID Number ||
 router.put("/:id", async (req, res, next) => {
   try {
     const order = await prisma.order.update({
@@ -27,7 +27,7 @@ router.put("/:id", async (req, res, next) => {
       },
       data: {
         userId: req.body.userId,
-        isCart: true,
+        total: req.body.total,
         //user: { connect: { id: req.user.id } },
       },
     });
@@ -42,7 +42,7 @@ router.put("/:id", async (req, res, next) => {
   }
 });
 
-//GET || Get an Order by UserID
+//GET || Get an Order by UserID 
 router.get("/:userId", async (req, res, next) => {
   try {
     const userId = parseInt(req.params.userId, 10);
@@ -65,7 +65,7 @@ router.get("/:userId", async (req, res, next) => {
   }
 });
 
-//GET || Get the Order by ID
+//GET || Get the Order by ORDERID NUMBER
 router.get("/:id", async (req, res, next) => {
   try {
     const order = await prisma.order.findFirst({
@@ -83,6 +83,17 @@ router.get("/:id", async (req, res, next) => {
     next(error);
   }
 });
+
+  //Find all order details referring to the Order ID
+  const results = [];
+  for (let order of orders) {
+    const orderdetails = await prisma.orderdetails.findMany({
+      where: {
+        orderid: order.id,
+      },
+    });
+    results.push({ order, orderdetails });
+  }
 
 //DELETE   || Deleting an order
 router.delete("/:id", async (req, res, next) => {
