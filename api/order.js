@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 const router = express.Router();
 
 
-//POST || Admin can view customer/admin orders from id ||ReTest
+//POST || Admin can view orders from id ||TEST APPROVED!
 //Added a loop
 router.post("/customer", async (req, res, next) => {
   try {
