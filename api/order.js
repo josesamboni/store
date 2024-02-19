@@ -3,13 +3,73 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const router = express.Router();
 
-//POST ||   Create an Order for an existing User || TEST APPROVED!
+
+//POST || Admin can view customer/admin orders from id ||ReTest
+//Added a loop
+router.post("/customer", async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.send("Need to login");
+    }
+
+    const user = await prisma.user.findFirst({
+      where: {
+        id: req.user.id,
+      },
+    });
+
+    if (!user.isadmin) {
+      return res.send("Not admin user");
+    }
+
+    //Admin finding all orders by user Id
+    const orders = await prisma.order.findMany({
+      where: {
+        userId: req.body.id,
+      },
+    });
+
+//Finding all order details by orderId using a For Loop
+//The end result will contain an Array with objects representing an Order associated with Order details. 
+const results = [];
+    for (let order of orders) {
+      const orderDetail = await prisma.orderDetail.findMany({
+        where: {
+          orderId: order.id,
+        },
+      });
+      results.push({ order, orderDetail });
+    }
+     //Finding all product description of order details using a For Loop. 
+     const array = [];
+    for (let order of results) {
+      const productInfo = [];
+      for (let orders of order.orderDetail) {
+        productInfo.push({
+          ...orders,
+          productDescription: await prisma.product.findFirst({
+            where: {
+              id: orders.productId,
+            },
+          }),
+        });
+      }
+      array.push({ ...order.order, productInfo });
+    }
+
+    res.send(array);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST ||   Create an Order for an existing User || TEST APPROVED!
 router.post("/", async (req, res, next) => {
   try {
     const order = await prisma.order.create({
       data: {
         userId: req.body.userId,
-        total: req.body.total,
+        isCart: true,
       },
     });
     res.status(201).send(order);
@@ -18,7 +78,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-// PUT ||  Update an Order by orderID Number ||
+// // PUT ||  Update an Order by orderID Number || TEST APPROVED!
 router.put("/:id", async (req, res, next) => {
   try {
     const order = await prisma.order.update({
@@ -27,8 +87,7 @@ router.put("/:id", async (req, res, next) => {
       },
       data: {
         userId: req.body.userId,
-        total: req.body.total,
-        //user: { connect: { id: req.user.id } },
+        isCart: true,
       },
     });
 
@@ -42,10 +101,10 @@ router.put("/:id", async (req, res, next) => {
   }
 });
 
-//GET || Get an Order by UserID 
-router.get("/:userId", async (req, res, next) => {
+// //GET || Get All Orders by UserID || TEST APPROVED!
+router.get("/user/:userId", async (req, res, next) => {
   try {
-    const userId = parseInt(req.params.userId, 10);
+    const userId = parseInt(req.params.userId);
 
     if (isNaN(userId)){
       return res.status(400).send("Invalid user ID.");
@@ -65,7 +124,7 @@ router.get("/:userId", async (req, res, next) => {
   }
 });
 
-//GET || Get the Order by ORDERID NUMBER
+// //GET || Get Single Order by ORDERID ||TEST APPROVED!
 router.get("/:id", async (req, res, next) => {
   try {
     const order = await prisma.order.findFirst({
@@ -84,18 +143,9 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-  //Find all order details referring to the Order ID
-  const results = [];
-  for (let order of orders) {
-    const orderdetails = await prisma.orderdetails.findMany({
-      where: {
-        orderid: order.id,
-      },
-    });
-    results.push({ order, orderdetails });
-  }
+ 
 
-//DELETE   || Deleting an order
+// //DELETE   || Deleting an order || TEST APPROVED!
 router.delete("/:id", async (req, res, next) => {
   try {
     const order = await prisma.order.delete({
@@ -107,11 +157,10 @@ router.delete("/:id", async (req, res, next) => {
       return res.status(404).send("Order not found.");
     }
 
-    res.send(order);
+    res.send(array);
   } catch (error) {
     next(error);
   }
 });
 
 module.exports = router;
-

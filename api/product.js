@@ -4,7 +4,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient(); 
 
 
-// GET/api/products
+// GET/api/product     ||Getting all products ||Test Approved
 router.get('/', async(req, res, next) =>{
     try{
         const products = await prisma.product.findMany();
@@ -14,7 +14,7 @@ router.get('/', async(req, res, next) =>{
     }
 });
 
-// GET/api/products/:id
+// GET/api/product/:id || Get single product by ID|| ||Test Approved
 router.get('/:id', async (req, res, next) => {
     try{
         const singleProduct = await prisma.product.findUnique({
@@ -30,25 +30,24 @@ router.get('/:id', async (req, res, next) => {
     }
 });
 
-// GET/api/products/getOrder
-// router.get('/getOrder', async (req, res,next) => {
-//     try{
-//         const order = await prisma.order.findFirst({
-//             where: { userId: req.user.id },
-//             include: {
-//                 lineItems: {
-//                     include: {
-//                         product: true,
-//                     },
-
-//                 },
-//             },
-//         });
-//         res.json(order);
-//     } catch (err) {
-//         next(err);
-//     }
-// });
+//POST || Create new product
+router.post("/", async (req, res, next) => {
+    try {
+      const { productName, description, price, imageUrl } = req.body;
+      const product = await prisma.product.create({
+        data: {
+          productName,
+          description,
+          price,
+          imageUrl,
+        },
+      });
+      res.status(201).send(product);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
 
 // DELETE/api/products/:id
 // router.delete('/:id', async (req, res, next) => {

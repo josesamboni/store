@@ -19,7 +19,6 @@ model user {
   password  String
   isadmin   Boolean? @default(false)
   orders    order[]
-  carts      cart[]
 }
 
 model product {
@@ -27,7 +26,7 @@ model product {
   productName String
   description String
   price       Decimal     @db.Decimal(4, 2)
-  carts       cart[]
+  imageUrl   String
   orderDetails orderDetail[]
 }
 
@@ -35,24 +34,16 @@ model order {
   id           Int         @id @default(autoincrement())
   user         user        @relation(fields: [userId], references: [id])
   userId       Int
-  total        Float
-  orderDetails orderDetail[] @onDelete(CASCADE)    
+  isCart       Boolean   
+  orderDetails orderDetail[] 
 }
 
 model orderDetail {
 id           Int         @id @default(autoincrement()) 
 productId   Int
 orderId     Int?
-order       order?       @relation(fields: [orderId], references: [id], onDelete: CASCADE)
+order       order?       @relation(fields: [orderId], references: [id])
 product     product     @relation(fields: [productId], references: [id])
 quantity    Int 
 }
 
-model cart {
-  id        Int     @id @default(autoincrement())
-  user      user    @relation(fields: [userId], references: [id])
-  userId   Int
-  product   product @relation(fields: [productId], references: [id])
-  productId Int
-  quantity  Int
-}

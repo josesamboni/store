@@ -6,6 +6,7 @@ const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+
 // POST || Register new User Account || TEST APPROVED!
 
 router.post("/register", async (req, res, next) => {
@@ -51,12 +52,12 @@ router.post("/login", async (req, res, next) => {
 });
 
 
-// GET || Get the currently logged in user || ** RETEST 
-router.get("/me", async (req, res, next) => {
+// GET || Get the currently logged in user || TEST APPROVED!
+router.get("/:id", async (req, res, next) => {
   try {
     const user = await prisma.user.findFirst({
       where: {
-        id: Number(req.body.id),
+        id: Number(req.params.id),
       },
     });
     if (!user) {
@@ -67,9 +68,9 @@ router.get("/me", async (req, res, next) => {
 
     // delete user.password;
     // //get costumers orders
-    const order = await prisma.order.findFirst({
-    where: { userid: req.user.id },
-    });
+    // const order = await prisma.order.findFirst({
+    // where: { userid: req.user.id },
+    // });
 
     res.send(user);
   } catch (error) {

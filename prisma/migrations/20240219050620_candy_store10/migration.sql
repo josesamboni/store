@@ -16,6 +16,7 @@ CREATE TABLE "product" (
     "productName" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "price" DECIMAL(4,2) NOT NULL,
+    "imageUrl" TEXT NOT NULL,
 
     CONSTRAINT "product_pkey" PRIMARY KEY ("id")
 );
@@ -24,7 +25,7 @@ CREATE TABLE "product" (
 CREATE TABLE "order" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
-    "total" DOUBLE PRECISION NOT NULL,
+    "isCart" BOOLEAN NOT NULL,
 
     CONSTRAINT "order_pkey" PRIMARY KEY ("id")
 );
@@ -39,16 +40,6 @@ CREATE TABLE "orderDetail" (
     CONSTRAINT "orderDetail_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "cart" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
-    "productId" INTEGER NOT NULL,
-    "quantity" INTEGER NOT NULL,
-
-    CONSTRAINT "cart_pkey" PRIMARY KEY ("id")
-);
-
 -- CreateIndex
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
@@ -60,9 +51,3 @@ ALTER TABLE "orderDetail" ADD CONSTRAINT "orderDetail_orderId_fkey" FOREIGN KEY 
 
 -- AddForeignKey
 ALTER TABLE "orderDetail" ADD CONSTRAINT "orderDetail_productId_fkey" FOREIGN KEY ("productId") REFERENCES "product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "cart" ADD CONSTRAINT "cart_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "cart" ADD CONSTRAINT "cart_productId_fkey" FOREIGN KEY ("productId") REFERENCES "product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
