@@ -7,7 +7,7 @@ const user = [
     lastName: "Smith",
     email: "milo@gmail.com",
     password: "milo4445",
-    isAdmin: true,
+    isadmin: true,
   },
 
   {
@@ -15,7 +15,7 @@ const user = [
     lastName: "Freeman",
     email: "tyrice@gmail.com",
     password: "tyrice444",
-    isAdmin: true,
+    isadmin: true,
   },
 
   {
@@ -23,39 +23,40 @@ const user = [
     lastName: "Zheng",
     email: "fiona@gmail.com",
     password: "Fiona5888",
-    isAdmin: true,
+    isadmin: true,
   },
 ];
 
-const products = [
-  {
-    productName: "Skittles",
-    description:
-      "Skittles consist of hard sugar shells imprinted with the letter 'S', similar to M&M's which have the letter 'M'. The interior consists mainly of sugar, corn syrup, and hydrogenated palm kernel oil along with fruit juice, citric acid, and natural and artificial flavors.",
-    price: 2.99,
-  },
-
-  {
-    productName: "KitKat",
-    description:
-      "Kit Kat (stylised as KitKat in various countries) is a chocolate-covered wafer bar confection created by Rowntree's of York, United Kingdom.",
-    price: 3.99,
-  },
-
-  {
-    productName: "Snickers",
-    description:
-      "Snickers is a brand of chocolate bar consisting of nougat topped with caramel and peanuts, all encased in milk chocolate.",
+//Revised Data 
+const product = [
+  { productName: "Bubble Gum",
+    description: "Bubble gum candy is a soft and chewy sweet treat, offering a delightful and nostalgic experience for candy enthusiasts of all ages.",
     price: 1.99,
+    imageUrl: "https://assets3.thrillist.com/v1/image/3062675/1584x1056/crop;webp=auto;jpeg_quality=60;progressive.jpg"
+  },
+
+  {
+    productName: "Dark and Milk Chocolates",
+    description: "Chocolate is a beloved treat enjoyed by people all over the world. They are decadent confections made from cocoa beans, which are the seeds of the cacao tree",
+    price: 9.99,
+    imageUrl: "https://food.fnr.sndimg.com/content/dam/images/food/fullset/2022/04/12/fn_healthy-chocolate-getty_s4x3.jpg.rend.hgtvcom.1280.960.suffix/1649787692492.jpeg"
+  },
+
+  {
+    productName: "Taffy Candy",
+    description: "Taffy is a soft and chewy candy that is typically made from sugar, corn syrup, butter, and flavorings.",
+    price: 1.99,
+    imageUrl: "https://m.media-amazon.com/images/I/716nwFasHOL._SX679_.jpg"
   },
 
   {
     productName: "Hard Candy",
-    description:
-      "A hard candy is a sugar candy prepared from one or more sugar-based syrups that is heated to a temperature of 160 °C (320 °F) to make candy.",
-    price: 8.99,
+    description: "A hard candy is a sugar candy prepared from one or more sugar-based syrups that is heated to a temperature of 160 °C (320 °F) to make candy.",
+    price: 7.99,
+    imageUrl: "https://www.secretcandyshop.com/cdn/shop/products/hard_candy_watermelon.jpg?v=1658213364"
   },
 ];
+
 
 const order = [
   {
@@ -64,41 +65,41 @@ const order = [
   },
 ];
 
-const lineItems = [
+//Deleted Cart
+
+//Added OrderDetails
+const orderDetail = [
   {
-    orderId: 1,
     productId: 2,
+    orderId: 1,
     quantity: 3,
   },
 ];
 
+//Rearraigned order to avoid Key constraints (violations)
 // function
 const generateData = async () => {
-  await prisma.lineItems.deleteMany();
+  await prisma.orderDetail.deleteMany();
   await prisma.order.deleteMany();
   await prisma.product.deleteMany();
   await prisma.user.deleteMany();
-
+ 
   await prisma.$executeRaw`ALTER SEQUENCE "user_id_seq" RESTART WITH 1`;
   await prisma.$executeRaw`ALTER SEQUENCE "product_id_seq" RESTART WITH 1`;
   await prisma.$executeRaw`ALTER SEQUENCE "order_id_seq" RESTART WITH 1`;
-  // await prisma.$executeRaw`ALTER SEQUENCE "lineitems_id_seq" RESTART WITH 1`;
+  await prisma.$executeRaw`ALTER SEQUENCE "orderDetail_id_seq" RESTART WITH 1`;
+ 
 
-  await prisma.user.createMany({
-    data: user,
-  });
+  //Create users & products
+  await prisma.user.createMany({ data: user });
+  await prisma.product.createMany({ data: product });
 
-  await prisma.product.createMany({
-    data: products,
-  });
-
-  await prisma.order.createMany({
-    data: order,
-  });
-
-  await prisma.lineItems.createMany({
-    data: lineItems,
-  });
+  //create orders
+  await prisma.order.createMany({ data: order });
+  //create orderDetails
+  await prisma.orderDetail.createMany({ data: orderDetail });
+ 
 };
 
 generateData();
+

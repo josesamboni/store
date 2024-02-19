@@ -1,3 +1,7 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,7 +17,7 @@ model user {
   lastName  String
   email     String  @unique
   password  String
-  isAdmin   Boolean
+  isadmin   Boolean? @default(false)
   orders    order[]
 }
 
@@ -22,23 +26,25 @@ model product {
   productName String
   description String
   price       Decimal     @db.Decimal(4, 2)
-  lineItems   lineItems[]
+  imageUrl   String
+  orderDetails orderDetail[]
 }
 
 model order {
-  id        Int         @id @default(autoincrement())
-  userId    Int         
-  isCart    Boolean
-  lineItems lineItems[]
-  user      user        @relation(fields: [userId], references: [id])
+  id           Int         @id @default(autoincrement())
+  user         user        @relation(fields: [userId], references: [id])
+  userId       Int
+  isCart       Boolean   
+  orderDetails orderDetail[] 
 }
 
-model lineItems {
-  id        Int     @id @default(autoincrement())
-  quantity  Int
-  orderId   Int
-  productId Int
-  order     order   @relation(fields: [orderId], references: [id])
-  product   product @relation(fields: [productId], references: [id])
+model orderDetail {
+id           Int         @id @default(autoincrement()) 
+productId   Int
+orderId     Int?
+order       order?       @relation(fields: [orderId], references: [id])
+product     product     @relation(fields: [productId], references: [id])
+quantity    Int 
 }
+
 

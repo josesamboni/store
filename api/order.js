@@ -3,7 +3,67 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const router = express.Router();
 
-//POST ||   Create a new Order / add cart
+
+//POST || view customer orders from id || TEST APPROVED!
+//Added a loop
+router.post("/customer", async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.send("Need to login");
+    }
+
+    const user = await prisma.user.findFirst({
+      where: {
+        id: req.user.id,
+      },
+    });
+
+    if (!user.isadmin) {
+      return res.send("Not admin user");
+    }
+
+    //Admin finding all orders by user Id
+    const orders = await prisma.order.findMany({
+      where: {
+        userId: req.body.id,
+      },
+    });
+
+//Finding all order details by orderId using a For Loop
+//The end result will contain an Array with objects representing an Order associated with Order details. 
+const results = [];
+    for (let order of orders) {
+      const orderDetail = await prisma.orderDetail.findMany({
+        where: {
+          orderId: order.id,
+        },
+      });
+      results.push({ order, orderDetail });
+    }
+     //Finding all product description of order details using a For Loop. 
+     const array = [];
+    for (let order of results) {
+      const productInfo = [];
+      for (let orders of order.orderDetail) {
+        productInfo.push({
+          ...orders,
+          productDescription: await prisma.product.findFirst({
+            where: {
+              id: orders.productId,
+            },
+          }),
+        });
+      }
+      array.push({ ...order.order, productInfo });
+    }
+
+    res.send(array);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST ||   Create an Order for an existing User || TEST APPROVED!
 router.post("/", async (req, res, next) => {
   try {
     const order = await prisma.order.create({
@@ -18,7 +78,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-// PUT ||  Update an Order by orderID
+// // PUT ||  Update an Order by orderID Number || TEST APPROVED!
 router.put("/:id", async (req, res, next) => {
   try {
     const order = await prisma.order.update({
@@ -28,7 +88,6 @@ router.put("/:id", async (req, res, next) => {
       data: {
         userId: req.body.userId,
         isCart: true,
-        //user: { connect: { id: req.user.id } },
       },
     });
 
@@ -42,10 +101,10 @@ router.put("/:id", async (req, res, next) => {
   }
 });
 
-//GET || Get an Order by UserID
-router.get("/:userId", async (req, res, next) => {
+// //GET || Get All Orders by UserID || TEST APPROVED!
+router.get("/user/:userId", async (req, res, next) => {
   try {
-    const userId = parseInt(req.params.userId, 10);
+    const userId = parseInt(req.params.userId);
 
     if (isNaN(userId)){
       return res.status(400).send("Invalid user ID.");
@@ -65,7 +124,7 @@ router.get("/:userId", async (req, res, next) => {
   }
 });
 
-//GET || Get the Order by ID
+// //GET || Get Single Order by ORDERID ||TEST APPROVED!
 router.get("/:id", async (req, res, next) => {
   try {
     const order = await prisma.order.findFirst({
@@ -84,7 +143,9 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-//DELETE   || Deleting an order
+ 
+
+// //DELETE   || Deleting an order || TEST APPROVED!
 router.delete("/:id", async (req, res, next) => {
   try {
     const order = await prisma.order.delete({
@@ -96,11 +157,10 @@ router.delete("/:id", async (req, res, next) => {
       return res.status(404).send("Order not found.");
     }
 
-    res.send(order);
+    res.send(array);
   } catch (error) {
     next(error);
   }
 });
 
 module.exports = router;
-
