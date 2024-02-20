@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 
-// POST || Register new User Account || TEST APPROVED!
+// POST || Register/Create new User Account || TEST APPROVED!
 
 router.post("/register", async (req, res, next) => {
   try {
@@ -53,11 +53,11 @@ router.post("/login", async (req, res, next) => {
 
 
 // GET || Get the currently logged in user || TEST APPROVED!
-router.get("/:id", async (req, res, next) => {
+router.get("/me", async (req, res, next) => {
   try {
     const user = await prisma.user.findFirst({
       where: {
-        id: Number(req.params.id),
+        id: (req.user.id),
       },
     });
     if (!user) {
@@ -78,10 +78,6 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-// "firstName": "jose",
-// "lastName":  "samboni",
-// "email":     "dfas@gmail.com",
-// "password":  "sdgw456",
-// "isAdmin":    true
+
 
 module.exports = router;

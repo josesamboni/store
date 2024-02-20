@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.use("/product", require("./product"));
 router.use("/order", require("./order"));
+router.use("/user", require("./user"));
 
 
 module.exports = router;
