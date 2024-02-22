@@ -102,27 +102,57 @@ router.put("/:id", async (req, res, next) => {
 });
 
 // //GET || Get All Orders by UserID || TEST APPROVED!
-router.get("/user/:userId", async (req, res, next) => {
+// router.get("/user/:userId", async (req, res, next) => {
+//   try {
+//     const userId = parseInt(req.params.userId);
+
+//     if (isNaN(userId)){
+//       return res.status(400).send("Invalid user ID.");
+//     }
+//     const order = await prisma.order.findMany({
+//       where: {
+//         userId: userId, 
+//       },
+//     });
+
+//     if (!order || order.length === 0) {
+//       return res.status(404).send("Order not found.");
+//     }
+//     res.send(order);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+router.get("/getCartOrder", async (req, res, next) => {
   try {
-    const userId = parseInt(req.params.userId);
-
-    if (isNaN(userId)){
-      return res.status(400).send("Invalid user ID.");
-    }
-    const order = await prisma.order.findMany({
-      where: {
-        userId: userId, 
-      },
+    if(!req.user) return res.status(400).send("You must be logged in.")
+    const order = await prisma.order.findFirst({
+        where:{
+            userId: req.user.id,
+            isCart: true
+        }
+    })
+    !order&&res.send("No cart order.");
+    const orderDetail = await prisma.orderDetail.findMany({
+        where:{
+            orderId: order.id
+        }
     });
-
-    if (!order || order.length === 0) {
-      return res.status(404).send("Order not found.");
+    const orderDetailWithProduct = [];
+    for(let item of orderDetail){
+        const product = await prisma.product.findFirst({
+            where: {
+                id: item.productId
+            }
+        })
+        orderDetailWithProduct.push({...item,itemInfo:product})
     }
-    res.send(order);
+    res.send({order,info:orderDetailWithProduct})
   } catch (error) {
     next(error);
   }
-});
+})
 
 // //GET || Get Single Order by ORDERID ||TEST APPROVED!
 router.get("/:id", async (req, res, next) => {
@@ -137,13 +167,12 @@ router.get("/:id", async (req, res, next) => {
       return res.status(404).send("Order not found.");
     }
     
-    res.send(order);
+    res.send({order, id: req.params.id})
   } catch (error) {
     next(error);
   }
 });
 
- 
 
 // //DELETE   || Deleting an order || TEST APPROVED!
 router.delete("/:id", async (req, res, next) => {

@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-
 // POST || Register new User Account || TEST APPROVED!
 
 router.post("/register", async (req, res, next) => {
@@ -37,7 +36,8 @@ router.post("/login", async (req, res, next) => {
         email: req.body.email,
       },
     });
-
+    if (!user || user.email !== req.body.email)
+      return res.status(400).send("Invalid credentials");
     //bcrypt password
     const match = await bcrypt.compare(req.body.password, user?.password);
     if (!match) {
@@ -45,26 +45,26 @@ router.post("/login", async (req, res, next) => {
     }
     //create token with userID
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
-    res.send({ token });
+    res.send({ token, user });
   } catch (error) {
     next(error);
   }
 });
 
-
 // GET || Get the currently logged in user || TEST APPROVED!
 router.get("/:id", async (req, res, next) => {
+  const id= req.params.id
   try {
-    const user = await prisma.user.findFirst({
+    const user = await prisma.user.findUnique({
       where: {
-        id: Number(req.params.id),
+        id: Number(id),
       },
     });
     if (!user) {
       return res.status(404).send("user not found.");
     }
 
-//delete bc you dont want to send back the password to the user
+    //delete bc you dont want to send back the password to the user
 
     // delete user.password;
     // //get costumers orders
@@ -78,7 +78,4 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-
-
 module.exports = router;
-
